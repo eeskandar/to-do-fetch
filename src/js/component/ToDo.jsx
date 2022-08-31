@@ -23,10 +23,8 @@ export const ToDo = () => {
 	// for deleting
 	function deleteTask (i) {
 		const newTask = list.filter((task, index)=> {
-			if (task == list[i]) {
-				if(list.indexOf(task) == index) { 
+			if (i == index) {
 				return false
-				}
 			}
 			return true
 		})
