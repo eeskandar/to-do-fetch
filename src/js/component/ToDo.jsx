@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 export const ToDo = () => {
@@ -6,45 +6,130 @@ export const ToDo = () => {
 	const [stuffs, setStuffs] = useState("")
 	const [list, setList] = useState ([])
 	const [waiting, setWaiting] = useState (true)
+
+	//API stuff
+	const API_URL = "https://assets.breatheco.de/apis/fake/todos/"
 	
 	// for submitting
-	function submit (event) {
+	async function submit (event) {
 		if(event.key === "Enter" && stuffs.trim() !== "") {
 			setWaiting(false)
-			setList([...list, stuffs])
-			setStuffs('')
+			await updateUserList("Alejo")
+			await getUserList("Alejo")
+			setStuffs("")
 		}
 		if(event.key === "Enter" && stuffs.trim() == ""){
 			alert("Not sure what to add? Take it easy, I know you will think of something")
-			setStuffs('')
+			setStuffs("")
 		}
 	}
 
 	// for deleting
-	function deleteTask (i) {
-		const newTask = list.filter((task, index)=> {
+	async function deleteTask (i) {
+			const newTask = list.filter((task, index)=> {
 			if (i == index) {
 				return false
 			}
 			return true
 		})
-			if (newTask.length == 0){
-				setWaiting (true)
-			}
-			setList(newTask)
+		if (newTask.length == 0){
+			setWaiting (true)
+			deleteUser("Alejo")
+		} else {
+		await updateUserList("Alejo", newTask)
+		await getUserList("Alejo")
+		}
 	}
 
 	// for mapping
 	const Mapping = list.map((task, i) => {
 		return (
 				<li key={i} className="list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 mt-1 bg-dark text-white show-button">
-					{task}
+					{task.label}
 					<button key={i} type="button"
 					className="btn-close btn-close-white float-end invi-button"
 					onClick={(event) => deleteTask(i)}></button>
 				</li>
 		)
 	})	
+
+	//for fetch
+	async function createUser(user) {
+		try {
+			const response = await fetch(API_URL + `user/${user}`, {
+				method: "POST",
+				body: JSON.stringify([]),
+				headers: {
+					"Content-Type": "application/json"
+				}
+			})
+			if (!response.ok) {
+				new Error("Ocurrió un error en la solicitud")
+			}
+			const body = await response.json ()
+			console.log(response)
+			console.log(body)
+		}	
+		catch (error) {
+			console.log(error)
+		}
+	}
+
+	async function updateUserList(user, newFilteredList = null) {
+		try {
+			let data; 
+			data = [...list, {label: stuffs, done: false}]
+			if(newFilteredList != null){
+				data = newFilteredList
+			}
+			const response = await fetch(API_URL + `user/${user}`, {
+				method: "PUT",
+				body: JSON.stringify(data),
+				headers: {
+					"Content-Type": "application/json"
+				}
+			})
+			if (!response.ok) {
+				new Error("Ocurrió un error en la solicitud")
+			}
+			const body = await response.json ()
+			console.log(response)
+			console.log(body)
+		}	
+		catch (error) {
+			console.log(error)
+		}
+	}
+
+	async function getUserList(user) {
+		const response = await fetch(API_URL + `user/${user}`)
+		if (!response.ok) {
+			new Error("Ocurrió un errorsote en la solicitud")
+		}
+		const body = await response.json ()
+		setList(body)
+	}
+
+	async function deleteUser(user) {
+		try {
+			const response = await fetch(API_URL + `user/${user}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json"
+				}
+			})
+			if (!response.ok) {
+				new Error("Ocurrió un error en la solicitud")
+			}
+			const body = await response.json ()
+			await createUser(user)
+			console.log(response)
+			console.log(body)
+		}	
+		catch (error) {
+			console.log(error)
+		}
+	}
 
 	// display
 	return (
@@ -54,13 +139,13 @@ export const ToDo = () => {
 				<div className="row text-white justify-content-center fst-italic">-Someone, at some point (maybe)-</div>
 			</div>
 			<div className="row col-sm-8 col-md-8 col-lg-6 mx-auto">
-					<input id="tasker" 
-					type="text"
-					className={`list-group-item shadow border-0 ${waiting? "rounded" : "rounded-top"}`}
-					onChange={(event) => {setStuffs(event.target.value)}}
-					value = {stuffs}
-					onKeyDown={submit}
-					placeholder="What do you need to do?"></input>
+				<input id="tasker" 
+				type="text"
+				className={`list-group-item shadow border-0 ${waiting? "rounded" : "rounded-top"}`}
+				onChange={(event) => {setStuffs(event.target.value)}}
+				value = {stuffs}
+				onKeyDown={submit}
+				placeholder="What do you need to do?"></input>
 			</div>
 			<div>
 				{waiting? (
