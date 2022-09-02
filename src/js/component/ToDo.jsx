@@ -40,6 +40,7 @@ export const ToDo = () => {
 		} else {
 		await updateUserList(activeUser, newTask)
 		await getUserList(activeUser)
+		setVoidTodo(false)
 		}
 	}
 
@@ -152,7 +153,7 @@ export const ToDo = () => {
 				placeholder="What do you need to do?"></input>
 				{voidTodo ? (
 				<div class="alert alert-warning alert-dismissible mt-1 mb-0" role="alert">You can't add an empty task! Write something else</div>
-				) : ("")}
+				) : (null)}
 				</div>
 			<div>
 				{waiting? (
