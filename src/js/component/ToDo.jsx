@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EntryModal } from "./EntryModal.jsx";
+import { EntryModal } from "./EntryToast.jsx";
 
 export const ToDo = () => {
 
@@ -18,10 +18,10 @@ export const ToDo = () => {
 			setWaiting(false)
 			await updateUserList(activeUser)
 			await getUserList(activeUser)
+			setVoidTodo(false)
 			setstuff("")
 		}
 		if(event.key === "Enter" && stuff.trim() == ""){
-			//alert("Not sure what to add? Take it easy, I know you will think of something")
 			setVoidTodo(true)
 			setstuff("")
 		}
@@ -150,7 +150,10 @@ export const ToDo = () => {
 				value = {stuff}
 				onKeyDown={submit}
 				placeholder="What do you need to do?"></input>
-			</div>
+				{voidTodo ? (
+				<div class="alert alert-warning alert-dismissible mt-1 mb-0" role="alert">You can't add an empty task! Write something else</div>
+				) : ("")}
+				</div>
 			<div>
 				{waiting? (
 					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">Try adding a new task! 😎</div>
@@ -162,16 +165,6 @@ export const ToDo = () => {
 					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">...or let it go with the wind and erase all your tasks by pressing this cute raccoon <button className="btn" type="button" onClick={(event) => deleteUser(activeUser)}>🦝</button></div>
 				</ul>)}
 			</div>
-			{voidTodo? (
-			<div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-				<div className="toast-header">
-					<strong className="me-auto">You can't set an empty ToDo!</strong>
-					<button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-				</div>
-				<div className="toast-body">
-					That would break the space time (and this poor code too)...
-				</div>
-			</div>) : ('')}
 		</div>
 	);
 };
