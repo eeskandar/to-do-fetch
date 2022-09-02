@@ -1,26 +1,26 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 export const ToDo = () => {
 
-	const [stuffs, setStuffs] = useState("")
+	const [stuff, setstuff] = useState("")
 	const [list, setList] = useState ([])
 	const [waiting, setWaiting] = useState (true)
+	const [activeUser, setActiveUser] = useState ("Guest")
 
 	//API stuff
 	const API_URL = "https://assets.breatheco.de/apis/fake/todos/"
 	
 	// for submitting
 	async function submit (event) {
-		if(event.key === "Enter" && stuffs.trim() !== "") {
+		if(event.key === "Enter" && stuff.trim() !== "") {
 			setWaiting(false)
-			await updateUserList("Alejo")
-			await getUserList("Alejo")
-			setStuffs("")
+			await updateUserList(activeUser)
+			await getUserList(activeUser)
+			setstuff("")
 		}
-		if(event.key === "Enter" && stuffs.trim() == ""){
+		if(event.key === "Enter" && stuff.trim() == ""){
 			alert("Not sure what to add? Take it easy, I know you will think of something")
-			setStuffs("")
+			setstuff("")
 		}
 	}
 
@@ -33,11 +33,10 @@ export const ToDo = () => {
 			return true
 		})
 		if (newTask.length == 0){
-			setWaiting (true)
-			deleteUser("Alejo")
+			deleteUser(activeUser)
 		} else {
-		await updateUserList("Alejo", newTask)
-		await getUserList("Alejo")
+		await updateUserList(activeUser, newTask)
+		await getUserList(activeUser)
 		}
 	}
 
@@ -53,7 +52,7 @@ export const ToDo = () => {
 		)
 	})	
 
-	//for fetch
+	// for fetch
 	async function createUser(user) {
 		try {
 			const response = await fetch(API_URL + `user/${user}`, {
@@ -78,7 +77,7 @@ export const ToDo = () => {
 	async function updateUserList(user, newFilteredList = null) {
 		try {
 			let data; 
-			data = [...list, {label: stuffs, done: false}]
+			data = [...list, {label: stuff, done: false}]
 			if(newFilteredList != null){
 				data = newFilteredList
 			}
@@ -123,6 +122,8 @@ export const ToDo = () => {
 			}
 			const body = await response.json ()
 			await createUser(user)
+			setWaiting (true)
+			setList([])
 			console.log(response)
 			console.log(body)
 		}	
@@ -142,19 +143,20 @@ export const ToDo = () => {
 				<input id="tasker" 
 				type="text"
 				className={`list-group-item shadow border-0 ${waiting? "rounded" : "rounded-top"}`}
-				onChange={(event) => {setStuffs(event.target.value)}}
-				value = {stuffs}
+				onChange={(event) => {setstuff(event.target.value)}}
+				value = {stuff}
 				onKeyDown={submit}
 				placeholder="What do you need to do?"></input>
 			</div>
 			<div>
 				{waiting? (
-					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 disabled bg-transparent mt-1">Try adding a new task! 😎</div>
+					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">Try adding a new task! 😎</div>
 				) : (
 				<ul className="p-0">
 					{Mapping}
 					<div className="list-end col-sm-8 col-md-8 col-lg-6 mx-auto text-white rounded-bottom shadow"></div>
-					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 disabled bg-transparent mt-1">I know you can do it! Only {list.length} left to go!</div>
+					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">I know you can do it! Only {list.length} left to go!</div>
+					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">...or let it go with the wind and erase all your tasks by pressing this cute raccoon <button className="btn" type="button" onClick={(event) => deleteUser(activeUser)}>🦝</button></div>
 				</ul>)}
 			</div>
 		</div>
