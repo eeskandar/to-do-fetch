@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { EntryModal } from "./EntryModal.jsx";
 
 export const ToDo = () => {
 
-	const [stuff, setstuff] = useState ("")
+	const [stuff, setstuff] = useState("")
 	const [list, setList] = useState ([])
 	const [waiting, setWaiting] = useState (true)
 	const [activeUser, setActiveUser] = useState ("Guest")
-	const [voidTodo, setVoidTodo] = useState (false)
+	const [newUser, setNewUser] = useState("")
 
 	//API stuff
 	const API_URL = "https://assets.breatheco.de/apis/fake/todos/"
+	const users = [];
 	
 	// for submitting
 	async function submit (event) {
@@ -21,8 +21,7 @@ export const ToDo = () => {
 			setstuff("")
 		}
 		if(event.key === "Enter" && stuff.trim() == ""){
-			//alert("Not sure what to add? Take it easy, I know you will think of something")
-			setVoidTodo(true)
+			alert("Not sure what to add? Take it easy, I know you will think of something")
 			setstuff("")
 		}
 	}
@@ -135,9 +134,47 @@ export const ToDo = () => {
 		}
 	}
 
+	// to switch users
+	async function currentUser (user) {
+		setActiveUser(user)
+        await getUserList(user)
+    }
+
 	// display
 	return (
 		<div className="container-fluid">
+			<div>
+				<div className="dropdown">
+					<button className="btn text-white fw-bolder border-white btn-transparent dropdown-toggle mt-3" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+						{activeUser}
+					</button>
+					<ul className="dropdown-menu" aria-labelledby="dropdownMenu2">
+						<li><button className="dropdown-item" type="button" onClick={(e)=>currentUser("Alejo")}>Alejo</button></li>
+						<li><button className="dropdown-item" type="button" onClick={(e)=>currentUser("Guest")}>Guest</button></li>
+						{/*MappingUsers*/}
+						<li><button className="btn mt-3" data-bs-toggle="modal" href="#modalToggle" role="button">Create a new user</button></li>
+					</ul>
+				</div>
+				<div className="modal fade" id="modalToggle" aria-hidden="true" aria-labelledby="modalToggleLabel" tabIndex="0">
+					<div className="modal-dialog">
+						<div className="modal-content">
+							<div className="row p-3 pb-4">
+							<input id="usefier" 
+								type="text"
+								className="list-group-item shadow border-0 rounded"
+								//onChange={(event) => {setNewUser(event.target.value)}}
+								//value = {newUser}
+								placeholder="Write your username here">
+								</input>
+							</div>
+							<div className="footer d-flex justify-content-center pb-3">
+								<button type="button" className="btn btn-success me-1" /*remove data-bs-dismiss when making it work -->*/data-bs-dismiss="modal">Register!</button>
+								<button type="button" className="btn btn-secondary ms-1" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+       		</div>
 			<div className="mt-3 mb-4">
 				<div className="row justify-content-center text-white fs-1 fst-italic fw-bolder text-center">"The Best Way to Know What to Do <br></br> Is to Write Your ToDos"</div>
 				<div className="row text-white justify-content-center fst-italic">-Someone, at some point (maybe)-</div>
@@ -155,25 +192,14 @@ export const ToDo = () => {
 				{waiting? (
 					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">Try adding a new task! 😎</div>
 				) : (
-				<ul className="p-0">
-					{Mapping}
-					<div className="list-end col-sm-8 col-md-8 col-lg-6 mx-auto text-white rounded-bottom shadow"></div>
-					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">I know you can do it! Only {list.length} left to go!</div>
-					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">...or let it go with the wind and erase all your tasks by pressing this cute raccoon <button className="btn" type="button" onClick={(event) => deleteUser(activeUser)}>🦝</button></div>
-				</ul>)}
+					<ul className="p-0">
+						{Mapping}
+						<div className="list-end col-sm-8 col-md-8 col-lg-6 mx-auto text-white rounded-bottom shadow"></div>
+						<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">I know you can do it! Only {list.length} left to go!</div>
+						<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">...or let it go with the wind and erase all your tasks by pressing this cute raccoon <button className="btn" type="button" onClick={(event) => deleteUser(activeUser)}>🦝</button></div>
+					</ul>
+				)}
 			</div>
-			{voidTodo? (
-			<div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-				<div className="toast-header">
-					<strong className="me-auto">You can't set an empty ToDo!</strong>
-					<button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-				</div>
-				<div className="toast-body">
-					That would break the space time (and this poor code too)...
-				</div>
-			</div>) : ('')}
 		</div>
 	);
 };
-
-// gracias por tanto y disculpen por tan poco, caballeros 😥
