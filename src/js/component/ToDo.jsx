@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { EntryModal } from "./EntryToast.jsx";
+import React, { useEffect, useState } from "react";
 
 export const ToDo = () => {
 
 	const [stuff, setstuff] = useState ("")
 	const [list, setList] = useState ([])
-	const [waiting, setWaiting] = useState (true)
 	const [activeUser, setActiveUser] = useState ("Guest")
 	const [voidTodo, setVoidTodo] = useState (false)
 
@@ -15,7 +13,6 @@ export const ToDo = () => {
 	// for submitting
 	async function submit (event) {
 		if(event.key === "Enter" && stuff.trim() !== "") {
-			setWaiting(false)
 			await updateUserList(activeUser)
 			await getUserList(activeUser)
 			setVoidTodo(false)
@@ -54,7 +51,7 @@ export const ToDo = () => {
 					onClick={(event) => deleteTask(i)}></button>
 				</li>
 		)
-	})	
+	})
 
 	// for fetch
 	async function createUser(user) {
@@ -110,7 +107,12 @@ export const ToDo = () => {
 			new Error("Ocurrió un errorsote en la solicitud")
 		}
 		const body = await response.json ()
-		setList(body)
+		if(body[0].label == "sample task") {
+			setList([])
+		} else {
+			setList(body)
+		}
+		console.log(body)
 	}
 
 	async function deleteUser(user) {
@@ -126,7 +128,6 @@ export const ToDo = () => {
 			}
 			const body = await response.json ()
 			await createUser(user)
-			setWaiting (true)
 			setList([])
 			console.log(response)
 			console.log(body)
@@ -135,6 +136,11 @@ export const ToDo = () => {
 			console.log(error)
 		}
 	}
+
+
+	useEffect(()=>{
+		getUserList(activeUser)
+	},[])
 
 	// display
 	return (
@@ -146,17 +152,17 @@ export const ToDo = () => {
 			<div className="row col-sm-8 col-md-8 col-lg-6 mx-auto">
 				<input id="tasker" 
 				type="text"
-				className={`list-group-item shadow border-0 ${waiting? "rounded" : "rounded-top"}`}
+				className="list-group-item shadow border-0 rounded"
 				onChange={(event) => {setstuff(event.target.value)}}
 				value = {stuff}
 				onKeyDown={submit}
 				placeholder="What do you need to do?"></input>
-				{voidTodo ? (
-				<div class="alert alert-warning alert-dismissible mt-1 mb-0" role="alert">You can't add an empty task! Write something else</div>
-				) : (null)}
+				{voidTodo && (
+				<div className="alert alert-warning alert-dismissible mt-1 mb-0" role="alert">You can't add an empty task! Write something else</div>
+				)}
 				</div>
 			<div>
-				{waiting? (
+				{ list.length == 0 ? (
 					<div className="text-white list-group-item col-sm-8 col-md-8 col-lg-6 mx-auto border-0 bg-transparent mt-1">Try adding a new task! 😎</div>
 				) : (
 				<ul className="p-0">
