@@ -107,7 +107,7 @@ export const ToDo = () => {
 			new Error("Ocurrió un errorsote en la solicitud")
 		}
 		const body = await response.json ()
-		if(body[0].label == "sample task") {
+		if(body[0].label === "sample task") {
 			setList([])
 		} else {
 			setList(body)
