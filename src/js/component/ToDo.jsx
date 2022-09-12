@@ -4,11 +4,11 @@ export const ToDo = () => {
 
 	const [stuff, setstuff] = useState ("")
 	const [list, setList] = useState ([])
-	const [activeUser, setActiveUser] = useState ("Guest")
 	const [voidTodo, setVoidTodo] = useState (false)
 
 	//API stuff
 	const API_URL = "https://assets.breatheco.de/apis/fake/todos/"
+	let activeUser = "Guest"
 	
 	// for submitting
 	async function submit (event) {
@@ -67,8 +67,6 @@ export const ToDo = () => {
 				new Error("Ocurrió un error en la solicitud")
 			}
 			const body = await response.json ()
-			console.log(response)
-			console.log(body)
 		}	
 		catch (error) {
 			console.log(error)
@@ -93,8 +91,6 @@ export const ToDo = () => {
 				new Error("Ocurrió un error en la solicitud")
 			}
 			const body = await response.json ()
-			console.log(response)
-			console.log(body)
 		}	
 		catch (error) {
 			console.log(error)
@@ -112,7 +108,6 @@ export const ToDo = () => {
 		} else {
 			setList(body)
 		}
-		console.log(body)
 	}
 
 	async function deleteUser(user) {
@@ -129,8 +124,6 @@ export const ToDo = () => {
 			const body = await response.json ()
 			await createUser(user)
 			setList([])
-			console.log(response)
-			console.log(body)
 		}	
 		catch (error) {
 			console.log(error)
