@@ -132,6 +132,7 @@ export const ToDo = () => {
 
 
 	useEffect(()=>{
+		createUser("Guest")
 		getUserList(activeUser)
 	},[])
 
