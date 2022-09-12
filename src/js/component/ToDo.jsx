@@ -100,7 +100,7 @@ export const ToDo = () => {
 	async function getUserList(user) {
 		const response = await fetch(API_URL + `user/${user}`)
 		if (!response.ok) {
-			new Error("Ocurrió un errorsote en la solicitud")
+			createUser("Guest")
 		}
 		const body = await response.json ()
 		if(body[0].label === "sample task") {
@@ -132,7 +132,6 @@ export const ToDo = () => {
 
 
 	useEffect(()=>{
-		createUser("Guest")
 		getUserList(activeUser)
 	},[])
 
